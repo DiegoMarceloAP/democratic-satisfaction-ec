@@ -1,0 +1,29 @@
+# ============================================================
+# Entorno Python
+# ============================================================
+.venv/
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# ============================================================
+# Datos -- NO se versionan (ver README.md, sección "Datos")
+# ------------------------------------------------------------
+# data/raw pesa >500MB (microdatos ENEMDU crudos) y data/processed
+# se regenera determinísticamente a partir de raw + src/data_prep/.
+# Ambos quedan fuera del repositorio; el README documenta cómo
+# reconstruirlos (scripts/extraer_enemdu_superset.py + notebooks).
+# ============================================================
+data/raw/*
+!data/raw/LEEME.md
+data/processed/
+data/models/
+
+# ============================================================
+# Artefactos del sistema operativo / editor
+# ============================================================
+.DS_Store
+Thumbs.db
+.vscode/
+*.egg-info/

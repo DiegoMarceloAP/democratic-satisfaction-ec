@@ -1,0 +1,16 @@
+feature,importancia_media_abs_shap
+democ_supp_cat,0.13752220622992384
+econ_situation_cat,0.08501691534940994
+resp_economic_perception_cat,0.07028769873385515
+confidence_congress_alta,0.05252167158039192
+ideologia_cat,0.05125795632991797
+ingreso_promedio_laboral,0.02893610955398384
+empleo_formal,0.02378421012789897
+v2xeg_eqaccess,0.02309240665983924
+confidence_army_alta,0.021336339186742666
+confidence_political_parties_alta,0.02131171180736406
+v2pepwrort,0.020989491145620855
+empleo_informal,0.020713595052947516
+confidence_judiciary_alta,0.020112615099866536
+v2xlg_legcon,0.01702913343657027
+confidence_police_alta,0.01476386424544796

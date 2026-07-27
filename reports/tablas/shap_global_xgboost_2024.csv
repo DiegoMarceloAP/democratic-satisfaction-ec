@@ -1,0 +1,16 @@
+feature,importancia_media_abs_shap
+empleo_formal,0.5511464
+econ_situation_cat,0.527761
+democ_supp_cat,0.340882
+v2xeg_eqprotec,0.17746054
+confidence_congress_alta,0.15589252
+confidence_judiciary_alta,0.13401982
+v2x_polyarchy,0.11084749
+confidence_army_alta,0.106786974
+confidence_political_parties_alta,0.10447279
+confidence_police_alta,0.08612691
+resp_economic_perception_cat,0.07830287
+goods_car_bin,0.06732106
+job_concern,0.05972033
+resp_religion,0.05293836
+v2x_delibdem,0.038846515

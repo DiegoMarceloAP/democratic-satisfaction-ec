@@ -1,0 +1,16 @@
+feature,importancia_media_abs_shap
+v2xeg_eqdr,0.12329570125752701
+v2xel_frefair,0.0487918341006014
+democ_supp_cat,0.042075078029900466
+econ_situation_cat,0.0373880335624234
+v2pepwrsoc,0.03096576074277574
+v2xeg_eqaccess,0.0260557134562945
+v2xeg_eqprotec,0.017801661023354096
+confidence_congress_alta,0.015479626644345821
+confidence_judiciary_alta,0.011590705042091958
+confidence_police_alta,0.011320927886911263
+ingreso_promedio_laboral,0.009326228999042653
+confidence_political_parties_alta,0.008597150437931635
+empleo_formal,0.00468397090676769
+resp_chief,0.004486204788612883
+tasa_participacion_global,0.003214437810195858

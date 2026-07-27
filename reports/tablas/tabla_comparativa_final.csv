@@ -1,0 +1,5 @@
+modelo,n_folds,accuracy_mean,accuracy_std,f1_macro_mean,f1_macro_std,f1_weighted_mean,f1_weighted_std,f1_satisfecho_mean,f1_satisfecho_std,pr_auc_mean,pr_auc_std,tiempo_entrenamiento_seg_mean,tiempo_entrenamiento_seg_std
+XGBoost,8,0.7394,0.1042,0.6296,0.049,0.7273,0.0953,0.4944,0.2141,0.564,0.1942,0.575,0.1236
+LightGBM,8,0.7299,0.1055,0.6211,0.0433,0.7196,0.0959,0.4815,0.2073,0.5506,0.1985,1.1438,0.7049
+CNN-LSTM,8,0.7133,0.1115,0.5768,0.0745,0.6892,0.1055,0.3962,0.2642,0.549,0.2058,39.12,10.405
+TabNet,8,0.6846,0.1129,0.5663,0.0505,0.6754,0.097,0.4337,0.2631,0.4961,0.2164,163.3662,60.1674

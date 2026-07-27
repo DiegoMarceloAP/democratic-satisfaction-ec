@@ -1,0 +1,16 @@
+feature,importancia_media_abs_shap
+democ_supp_cat,0.13297321355073596
+confidence_congress_alta,0.07222642344865271
+econ_situation_cat,0.05948405536528478
+goods_hot_water_bin,0.04470971587241268
+ideologia_cat,0.039881945328479766
+resp_employment,0.031346249381099076
+resp_education,0.03096521411271541
+resp_economic_perception_cat,0.027203823825870437
+resp_sex,0.026166005881670205
+confidence_judiciary_alta,0.020427412501960656
+job_concern,0.019596906043059154
+v2xel_frefair,0.019471180373375044
+resp_chief,0.01832129475040113
+resp_religion,0.01792962799597085
+confidence_army_alta,0.01699353608408255
