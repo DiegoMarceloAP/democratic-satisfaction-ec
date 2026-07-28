@@ -29,15 +29,14 @@ originales, igual que en los demás modelos).
 
 NOTA DE VALIDACIÓN: la construcción de los arreglos de entrada (código
 categórico + escalado + hstack + límites de cat_idxs/cat_dims) se
-validó con datos sintéticos, reutilizando la misma preparación de datos
-que baseline_xgboost.py/baseline_lightgbm.py (ya probada con ejecución
-real). El entrenamiento de TabNet en sí (que depende de 'torch' y
-'pytorch-tabnet') no se pudo ejecutar en este entorno: el paquete
-'torch' excede el tamaño soportado por el entorno de desarrollo usado
-para escribir este módulo (mismo problema documentado en cnn_lstm.py).
-El entrenamiento real debe ejecutarse en un equipo con 'torch'/
-'pytorch-tabnet' instalados; ver README.md de esta carpeta para el
-resultado de esa validación.
+validó primero con datos sintéticos, reutilizando la misma preparación
+de datos que baseline_xgboost.py/baseline_lightgbm.py (ya probada con
+ejecución real) -- necesario porque el paquete 'torch' excedía el
+tamaño soportado por el entorno de desarrollo usado para escribir este
+módulo (mismo problema documentado en cnn_lstm.py). El entrenamiento
+real (con 'torch'/'pytorch-tabnet' instalados) ya se ejecutó y validó
+sobre el dataset completo; ver README.md de esta carpeta para los
+resultados por fold.
 """
 import sys
 import time

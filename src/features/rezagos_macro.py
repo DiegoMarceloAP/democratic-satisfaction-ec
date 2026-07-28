@@ -1,7 +1,7 @@
 """
 rezagos_macro.py
 ---------------------------------------------------------------------
-Fase de Preparación de Features - variables macro REZAGADAS (lags) para
+Fase de Modelado (CRISP-DM) - preparación de features: variables macro REZAGADAS (lags) para
 los modelos NO secuenciales (XGBoost, LightGBM, TabNet), a pedido del
 tutor de tesis: sustentar el tema de "temporalidad" también en los
 modelos tabulares, no solo en el CNN-LSTM.

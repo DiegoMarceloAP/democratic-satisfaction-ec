@@ -1,17 +1,14 @@
 """
 latinobarometro_loader_crudo.py
 ---------------------------------------------------------------------
-Fase 2 (Preparación de datos) - CRISP-DM
-Tesis: Deep Learning for Modeling Democratic Satisfaction and
-Socioeconomic Inequality in Ecuador.
+Fase 2 (Preparación de datos) - CRISP-DM.
 
-FUENTE (revisión con tutor, reemplaza a latinobarometro_loader_oficial.py):
-descarga directa desde el sitio de Latinobarómetro de los microdatos de
-Ecuador de cada ola (2007-2024), NO la extracción vía Superset (que tenía
-inconsistencias y no pudo utilizarse -- ver limitaciones de la tesis) ni
-el archivo pre-armonizado de la sesión anterior. Cada ola trae su propio
-"Libro de Códigos" (PDF) con los nombres de columna que usó Latinobarómetro
-ESE año en particular (no son constantes entre olas).
+FUENTE: descarga directa desde el sitio de Latinobarómetro de los
+microdatos de Ecuador de cada ola (2007-2024), no la extracción vía
+Superset (que tenía inconsistencias y fue retirada del proyecto -- ver
+sql/README_extraccion.md). Cada ola trae su propio "Libro de Códigos" (PDF) con los nombres de
+columna que usó Latinobarómetro ese año en particular (no son
+constantes entre olas).
 
 Este módulo combina DOS formatos de origen distintos, según lo que cada
 ola tiene disponible y lo que resultó confiable tras la verificación:
@@ -47,18 +44,16 @@ ola tiene disponible y lo que resultó confiable tras la verificación:
     'democ_satis': para 2007-2010, la columna con ese nombre literal en
     el CSV NUNCA fue la variable correcta.
 
-VARIABLES QUE QUEDAN FUERA (decisión explícita del tutor, no un
-descuido):
+VARIABLES QUE QUEDAN FUERA:
   - elections_vote: solo tiene dato real en 1 de las 13 olas (2009);
     inutilizable como serie temporal, se descarta permanentemente.
   - resp_economic_perception: solo existe en 6 de las 13 olas
     (2008-2015); se conserva con NA explícito en el resto -- es un
     hueco estructural del cuestionario, no un error de esta extracción.
 
-VARIABLES RECUPERADAS respecto a la sesión anterior (existen en las
-descargas directas, aunque no estaban en el archivo pre-armonizado que
-se usó antes): goods_wash_mach, goods_car, goods_sewage, goods_hot_water,
-resp_chief -- cobertura completa en las 13 olas.
+VARIABLES CON COBERTURA COMPLETA EN LAS 13 OLAS (confirmadas en la
+descarga directa): goods_wash_mach, goods_car, goods_sewage,
+goods_hot_water, resp_chief.
 """
 import glob
 from pathlib import Path

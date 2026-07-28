@@ -1,9 +1,7 @@
 """
 latinobarometro_processing.py
 ---------------------------------------------------------------------
-Fase 2 (Preparación de datos) - CRISP-DM
-Tesis: Deep Learning for Modeling Democratic Satisfaction and
-Socioeconomic Inequality in Ecuador.
+Fase 2 (Preparación de datos) - CRISP-DM.
 
 Procesa los microdatos de encuestados de Latinobarómetro Ecuador y
 construye:
@@ -18,10 +16,9 @@ encuestado individual. La columna 'anio' (= research_year) es la llave
 que luego se usa para pegar los indicadores nacionales anuales de ENEMDU
 y V-Dem (decisión de merge nacional-año, ver sql/README_extraccion.md).
 
-FUENTE (revisión con tutor): los datos de Latinobarómetro para Ecuador
-ya NO vienen de Superset (la extracción SQL en
-sql/02_latinobarometro_ecuador.sql tenía inconsistencias y no se pudo
-utilizar -- ver limitaciones de la tesis). RAW_PATH apunta al archivo
+FUENTE: los datos de Latinobarómetro para Ecuador no vienen de Superset
+(la extracción SQL original tenía inconsistencias y fue retirada del
+proyecto -- ver sql/README_extraccion.md). RAW_PATH apunta al archivo
 generado por latinobarometro_loader_crudo.py a partir de las descargas
 directas de Latinobarómetro (CSV crudo 2007-2010, SPSS .sav 2011-2024),
 que trae los 13 años reales correctamente etiquetados y verificados

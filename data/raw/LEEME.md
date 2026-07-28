@@ -1,6 +1,6 @@
-# Qué va en esta carpeta
+# Carpeta raw
 
-Aquí van los resultados de las consultas SQL (Superset) para V-Dem, ENEMDU y el diccionario de provincias, exportados como CSV, más las descargas directas de Latinobarómetro (ya NO vienen de Superset -- ver nota abajo). Nombres exactos esperados por los scripts de `src/data_prep/`:
+Contiene los resultados de las consultas SQL (Superset) para V-Dem, ENEMDU y el diccionario de provincias, exportados como CSV, más las descargas directas de Latinobarómetro. Nombres exactos esperados por los scripts de `src/data_prep/`:
 
 ```
 data/raw/
@@ -12,14 +12,12 @@ data/raw/
 │   ├── ...
 │   ├── enemdu_persona_201712_pagina1.csv  <- periodos grandes: varias páginas (sql/04b_...)
 │   └── enemdu_persona_201712_pagina2.csv
-├── latinobarometro_codebook_oficial.xlsx  <- crosswalk oficial (ya provisto)
+├── latinobarometro_codebook_oficial.xlsx  <- crosswalk oficial 
 └── latinobarometro/                     <- descargas DIRECTAS de Latinobarómetro (NO Superset)
     ├── Latinobarometro_2007_Ecuador_Csv_esp_v1.csv   (... 2008, 2009, 2010: CSV crudo)
     └── Latinobarometro_2011_Ecuador_Spss_esp_v1.sav  (... 2013...2024: SPSS .sav)
 ```
 
-No importa el nombre exacto de cada archivo de `enemdu_persona/`, siempre que empiece con `enemdu_persona_` y termine en `.csv` — el script los junta todos automáticamente.
+El script enemdu_processing.py es el encargado de juntar automáticamente los archivos de `enemdu_persona/`, siempre que empiece con `enemdu_persona_` y termine en `.csv`
 
-**Latinobarómetro (revisión con tutor):** la extracción vía Superset (`sql/02_latinobarometro_ecuador.sql`) presentó inconsistencias y no se pudo usar; se conserva solo como registro histórico. Los datos de Latinobarómetro se descargan directamente del sitio oficial y se procesan con `src/data_prep/latinobarometro_loader_crudo.py` (ver docstring de ese módulo para el detalle de por qué se mezclan dos formatos, CSV y SPSS).
-
-**`enemdu_vivienda`:** se eliminó del alcance del proyecto (no tenía ningún consumidor de código; quedaba documentado solo como idea para una futura construcción de NBI/IPM, nunca se llegó a extraer). Si en algún momento se retoma esa idea, habría que volver a escribir la consulta SQL y un script de procesamiento nuevos.
+**Latinobarómetro:** la extracción vía Superset (`sql/02_latinobarometro_ecuador.sql`) presentó inconsistencias y no se pudo usar; se conserva solo como registro histórico. Los datos de Latinobarómetro se descargan directamente del sitio oficial y se procesan con `src/data_prep/latinobarometro_loader_crudo.py` (ver docstring de ese módulo para el detalle de por qué se mezclan dos formatos, CSV y SPSS).

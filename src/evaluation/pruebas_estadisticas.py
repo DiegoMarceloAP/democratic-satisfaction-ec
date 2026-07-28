@@ -3,8 +3,7 @@ pruebas_estadisticas.py
 ---------------------------------------------------------------------
 Fase de Evaluación (CRISP-DM) - Prueba estadística formal de la
 comparación entre los 4 modelos (XGBoost, LightGBM, CNN-LSTM, TabNet),
-agregada a pedido del tutor y del revisor externo tras la defensa
-preliminar: la Sección 5.2 afirmaba, solo a partir de la inspección
+la Sección 5.2 afirmaba, solo a partir de la inspección
 visual de las barras de error, que las diferencias entre modelos "no
 alcanzan a ser estadísticamente concluyentes". Este script reemplaza
 esa afirmación informal por una prueba formal.
