@@ -43,18 +43,16 @@ que quedaron faltantes (mask=False) se imputan ANTES de aplanar
 (SMOTE no acepta NaN) usando la mediana de ESE mismo timestep, con
 estadísticas calculadas solo con observaciones reales de X_train.
 
-NOTA DE VALIDACIÓN: toda la lógica de datos de este módulo (ventaneo,
+NOTA DE VALIDACIÓN: la lógica de datos de este módulo (ventaneo,
 aplanado, SMOTE, reconstrucción, alineación posicional de folds) se
-validó con datos sintéticos que reproducen la estructura real de
-dataset_modelado_personas.csv y panel_macro_anual.csv, incluyendo el
-caso límite de encuestados de 2007 con historia incompleta. El bucle de
-entrenamiento de PyTorch en sí (arquitectura, forward, entrenamiento)
-está escrito siguiendo la API estándar de torch.nn pero no pudo
-ejecutarse en este entorno porque el paquete 'torch' es demasiado
-grande para el entorno de desarrollo usado para escribir este módulo.
-El entrenamiento real debe ejecutarse en un equipo con 'torch' instalado
-(ver requirements.txt); ver README.md de esta carpeta para el resultado
-de esa validación.
+validó primero con datos sintéticos que reproducen la estructura real
+de dataset_modelado_personas.csv y panel_macro_anual.csv, incluyendo el
+caso límite de encuestados de 2007 con historia incompleta -- necesario
+porque el paquete 'torch' era demasiado grande para el entorno de
+desarrollo usado para escribir este módulo. El entrenamiento real (con
+'torch' instalado, ver requirements.txt) ya se ejecutó y validó sobre
+el dataset completo; ver README.md de esta carpeta para los resultados
+por fold.
 """
 import sys
 import time

@@ -1,9 +1,7 @@
 """
 vdem_processing.py
 ---------------------------------------------------------------------
-Fase 2 (Preparación de datos) - CRISP-DM
-Tesis: Deep Learning for Modeling Democratic Satisfaction and
-Socioeconomic Inequality in Ecuador.
+Fase 2 (Preparación de datos) - CRISP-DM.
 
 Procesa el extracto país-año de V-Dem para Ecuador (ver
 sql/01_vdem_ecuador.sql) y lo deja listo para el merge por 'anio' con

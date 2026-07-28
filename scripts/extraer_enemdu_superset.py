@@ -1,74 +1,56 @@
 """
 extraer_enemdu_superset.py
 ---------------------------------------------------------------------
-Automatiza la extracción de indicadores.enemdu_persona por periodo desde
-la API REST de Superset, para no tener que reemplazar '${PERIODO}' a
-mano y correr ~123 consultas una por una en SQL Lab (117 periodos, 6 de
-ellos con 2 páginas cada uno por superar 100,000 filas).
+Fase 1 (Extracción) - CRISP-DM: automatiza contra la API REST de Superset
+la misma extracción que definen 04_enemdu_persona_por_periodo.sql y
+04b_enemdu_persona_periodo_grande_paginado.sql (ver sql/README_extraccion.md),
+en vez de reemplazar '${PERIODO}'/'${OFFSET}' a mano y correr ~123
+consultas una por una en SQL Lab (117 periodos, 6 de ellos en 2 páginas
+por superar el límite de filas por consulta).
 
-TU ACCESO: solo usuario/contraseña por el navegador (confirmado). Esto
-SÍ es suficiente para usar la API de Superset -- el login programático
-usa el mismo mecanismo de autenticación que el navegador, no requiere
-que un administrador te habilite nada especial. Lo que no puedo
-garantizar sin probarlo contra tu instalación real es:
-  - Que tu Superset no use SSO/2FA (si el login es "usuario+contraseña
-    normal" en la pantalla de Superset, debería funcionar; si te
-    redirige a Google/Azure/etc., este método NO va a funcionar).
-  - La versión exacta de la API (este script usa los endpoints
-    estándar de Superset >= 2.0: /api/v1/security/login y
-    /api/v1/sqllab/execute/; si el Superset de destino es más viejo, el
-    endpoint legado es /superset/sql_json/ -- si el endpoint estándar
-    devuelve 404, adaptar la constante de endpoint más abajo).
+Requisitos de acceso: login usuario/contraseña estándar por la API
+(mismo mecanismo que usa el navegador; no requiere permisos de
+administrador). Dos limitaciones a validar contra la instalación real
+de destino:
+  - Si Superset usa SSO/2FA en vez de usuario+contraseña normal, este
+    método no funciona.
+  - El script usa los endpoints estándar de Superset >= 2.0
+    (/api/v1/security/login, /api/v1/sqllab/execute/); en instalaciones
+    más antiguas el endpoint legado es /superset/sql_json/.
 
-SOBRE EL DATABASE_ID (perfil de solo consulta, sin panel de administración):
-  El DATABASE_ID es un dato interno de SUPERSET (qué conexión usar), no
-  de ClickHouse -- por eso ninguna sentencia SQL contra 'indicadores' o
-  contra 'system.databases' puede revelarlo: ese tipo de consulta solo
-  confirma que el esquema 'indicadores' existe dentro de ClickHouse,
-  pero no tiene relación con el ID que usa Superset para identificar
-  esa conexión.
-  Alternativa sin acceso de administrador: deja SOLO_LISTAR_BASES = True
-  (ver más abajo) y corre el script una vez -- inicia sesión con tu
-  usuario y le pide a la API de Superset la misma lista de bases de
-  datos que ya ves en el dropdown "Database" de SQL Lab (la de tu
-  captura, donde eliges "clickhouse"). Como esa lista SÍ te la muestra
-  la interfaz normal de SQL Lab, tu usuario tiene permiso para pedirla
-  también por API, aunque no tengas acceso al panel de administración.
-  Si aun así la API te devuelve vacío o un error 403, la alternativa
-  100% segura es: abre las herramientas de desarrollador del navegador
-  (F12) > pestaña "Network", vuelve a seleccionar "clickhouse" en el
-  dropdown de SQL Lab, y busca en las peticiones alguna a
-  ".../api/v1/database/..." -- ahí viene el id en la respuesta.
+DATABASE_ID: identificador interno de Superset para la conexión a
+ClickHouse (no se puede obtener con SQL contra 'indicadores', porque
+ese id es propio de Superset, no de la base de datos). Para
+descubrirlo sin acceso de administrador: dejar SOLO_LISTAR_BASES = True
+y correr el script una vez -- pide por API la misma lista de conexiones
+que muestra el dropdown "Database" de SQL Lab. Si la API devuelve vacío
+o 403, la alternativa es abrir las herramientas de desarrollador del
+navegador (F12 > Network), seleccionar "clickhouse" en SQL Lab y
+revisar la petición a ".../api/v1/database/...".
 
-CÓMO USAR:
-  1) Completa SUPERSET_URL abajo. Para el DATABASE_ID, corre primero el
-     script con SOLO_LISTAR_BASES = True (ver nota arriba) para
-     descubrirlo, luego cámbialo a False y pon el id encontrado.
-  2) Prueba primero con PRUEBA_RAPIDA = True (corre solo 1 consulta chica)
-     para confirmar que el login funciona en tu instalación ANTES de
-     lanzar las 123 consultas completas.
-  3) NUNCA escribas tu contraseña en este archivo ni la pegues en el
-     chat. El script la pide de forma oculta (getpass) al ejecutarlo, o
-     la toma de la variable de entorno SUPERSET_PASSWORD si la
-     exportaste tú mismo en tu terminal.
-  4) Corre en tu terminal, parado en la raíz del proyecto (la carpeta
-     que contiene este archivo dentro de scripts/):
+Cómo usar:
+  1) Completar SUPERSET_URL abajo. Para DATABASE_ID, correr primero con
+     SOLO_LISTAR_BASES = True para descubrirlo, luego pasar a False.
+  2) Probar primero con PRUEBA_RAPIDA = True (1 sola consulta) para
+     confirmar que el login funciona antes de lanzar las ~123 consultas.
+  3) La contraseña nunca se escribe en este archivo: se pide de forma
+     oculta (getpass) al ejecutar, o se toma de la variable de entorno
+     SUPERSET_PASSWORD.
+  4) Desde la raíz del proyecto:
          pip install requests
          python scripts/extraer_enemdu_superset.py
 
 Qué hace:
-  - Inicia sesión en Superset (usuario/contraseña) y obtiene el token de
-    acceso + el token CSRF que exige la API para peticiones POST.
-  - Por cada periodo (y cada página, para los 6 periodos que superan
-    100k filas) ejecuta la consulta contra indicadores.enemdu_persona y
+  - Inicia sesión en Superset y obtiene el token de acceso + el token
+    CSRF que exige la API para peticiones POST.
+  - Por cada periodo (y cada página, para los periodos que superan 100k
+    filas) ejecuta la consulta contra indicadores.enemdu_persona y
     guarda el resultado como CSV en data/raw/enemdu_persona/, con el
-    mismo nombre de archivo que ya usa enemdu_processing.py.
-  - Si un archivo ya existe, lo salta -- puedes interrumpir el script
-    (Ctrl+C) y volver a correrlo después sin perder lo ya descargado.
-  - Alcance temporal: por defecto solo extrae periodos hasta 2024
-    (rango de la propuesta de tesis). Tu volumetría real ya trae datos
-    hasta 202604; si decides extender el alcance de la tesis más allá
-    de 2024, cambia INCLUIR_POSTERIORES_A_2024 a True.
+    mismo nombre de archivo que usa enemdu_processing.py.
+  - Si un archivo ya existe, lo salta -- el script puede interrumpirse
+    (Ctrl+C) y retomarse después sin perder lo ya descargado.
+  - Por defecto solo extrae periodos hasta 2024 (rango de la tesis);
+    cambiar INCLUIR_POSTERIORES_A_2024 a True para extender el alcance.
 """
 import csv
 import getpass
@@ -81,7 +63,7 @@ from pathlib import Path
 import requests
 
 # ======================================================================
-# CONFIGURACIÓN -- ajusta esto a tu instalación de Superset
+# CONFIGURACIÓN -- ajustar según la instalación de Superset de destino
 # ======================================================================
 
 # URL base de Superset tal como la usas en el navegador, SIN slash final.
@@ -93,22 +75,21 @@ SUPERSET_URL = os.environ.get("SUPERSET_URL", "http://172.20.9.55:8088")
 # (o "Data > Databases"), pasa el mouse/haz clic en "Editar" sobre la
 # conexión que apunta al esquema 'indicadores' -- el ID aparece en la
 # URL, algo como .../databases/edit/7  ->  el ID es 7.
-DATABASE_ID = int(os.environ.get("SUPERSET_DATABASE_ID", "1"))  # confirmado: id=1 -> "clickhouse"
+DATABASE_ID = int(os.environ.get("SUPERSET_DATABASE_ID", "1"))  # id=1 -> "clickhouse"
 
 SQL_SCHEMA = os.environ.get("SUPERSET_SCHEMA", "indicadores")
 USERNAME = os.environ.get("SUPERSET_USERNAME") or input("Usuario de Superset: ")
 
 # Proveedor de autenticación que espera Superset en el login. "db" es el
 # más común (usuario/contraseña guardados en la propia base de Superset).
-# Si tu organización usa LDAP/Active Directory detrás del formulario de
-# login (aunque visualmente sea igual: usuario+contraseña), puede que
-# necesites "ldap" aquí en vez de "db" -- pregúntale a quien administra
-# Superset si no lo sabes.
+# Si la organización usa LDAP/Active Directory detrás del formulario de
+# login (aunque visualmente sea igual: usuario+contraseña), puede
+# requerirse "ldap" en vez de "db".
 AUTH_PROVIDER = os.environ.get("SUPERSET_AUTH_PROVIDER", "db")
 
-# Ya se identificó el DATABASE_ID (1 -> "clickhouse"), así que esto queda
-# en False para pasar a probar la extracción real. Si alguna vez agregas
-# otra conexión y necesitas volver a listar bases de datos, ponlo en True.
+# DATABASE_ID ya identificado (1 -> "clickhouse"), así que queda en False
+# para la extracción real. Volver a poner en True solo si se agrega otra
+# conexión y hace falta listar bases de datos de nuevo.
 SOLO_LISTAR_BASES = False
 
 PRUEBA_RAPIDA = False  # deja True hasta confirmar que el login funciona; luego cambia a False
@@ -116,22 +97,19 @@ INCLUIR_POSTERIORES_A_2024 = False  # True si decides extender el alcance de la 
 
 OUT_DIR = Path("data/raw/enemdu_persona")
 
-# IMPORTANTE -- descubierto empíricamente al correr esto (no estaba
-# documentado de antemano): el límite de 100,000 filas que nos habían
-# indicado aplica a la exportación/descarga de CSV desde la interfaz de
-# SQL Lab, pero el endpoint de la API que este script usa para ejecutar
-# consultas de forma síncrona (/api/v1/sqllab/execute/) tiene su PROPIO
-# límite, más chico, para lo que devuelve inline en la respuesta JSON
-# (el conocido SQLLAB_DEFAULT_DBAPI_ROW_LIMIT de Superset, que en la
-# instalación real de este proyecto resultó ser 10,000). Por eso el primer intento con
-# páginas de 100,000 devolvió silenciosamente solo 10,000 filas por
-# archivo, sin error -- Superset simplemente corta ahí, no avisa. Se usan
-# páginas de 10,000 para esta vía de extracción (API, no descarga de CSV).
+# Descubierto empíricamente (no documentado de antemano): el límite de
+# 100,000 filas aplica a la exportación/descarga de CSV desde SQL Lab,
+# pero el endpoint de ejecución síncrona (/api/v1/sqllab/execute/) tiene
+# su propio límite, más chico, para lo que devuelve inline en el JSON
+# (SQLLAB_DEFAULT_DBAPI_ROW_LIMIT de Superset, 10,000 en esta instalación).
+# Un primer intento con páginas de 100,000 devolvió silenciosamente solo
+# 10,000 filas por archivo, sin error -- de ahí que esta vía de
+# extracción (API) use páginas de 10,000, no de 100,000.
 FILAS_POR_PAGINA_API = 10000
 
-# Volumetría real (periodo, n_filas), obtenida de 00_verificacion_volumetria.sql. Se usa
-# solo para decidir cuántas páginas necesita cada periodo -- la consulta
-# real vuelve a contar las filas en el servidor, esto no se asume ciego.
+# Volumetría real (periodo, n_filas), obtenida de 00_verificacion_volumetria.sql.
+# Se usa solo para decidir cuántas páginas necesita cada periodo -- la
+# consulta real vuelve a contar las filas en el servidor.
 VOLUMETRIA = [
     ("200706", 26774), ("200709", 26180), ("200712", 76922), ("200803", 26161), ("200806", 37869), ("200809", 26339),
     ("200812", 78742), ("200903", 26439), ("200906", 26772), ("200909", 25376), ("200912", 78878), ("201003", 24958),
@@ -202,6 +180,7 @@ def _fallar_con_detalle(resp: requests.Response, paso: str):
 
 
 def iniciar_sesion(password: str) -> requests.Session:
+    """Autentica contra la API de Superset y arma la sesión HTTP con el token de acceso y, si está disponible, el token CSRF."""
     resp = requests.post(
         f"{SUPERSET_URL}/api/v1/security/login",
         json={"username": USERNAME, "password": password, "provider": AUTH_PROVIDER, "refresh": True},
@@ -213,13 +192,12 @@ def iniciar_sesion(password: str) -> requests.Session:
     access_token = resp.json()["access_token"]
     print("  -> login OK, access_token obtenido.")
 
-    # El 403 en csrf_token que ya viste es "Forbidden" genérico de
-    # Flask-AppBuilder -- es decir, tu rol no tiene el permiso para ESE
-    # endpoint puntual, no es un problema de CSRF/Referer mal armado. En
-    # vez de fallar aquí, seguimos sin el token CSRF: las peticiones GET
-    # (como listar bases de datos) no lo necesitan, y vamos a probar
-    # aparte si la petición POST de extracción lo exige de verdad o si
-    # Superset la exime al venir autenticada con Bearer token.
+    # Un 403 en csrf_token es "Forbidden" genérico de Flask-AppBuilder:
+    # el rol del usuario no tiene permiso para ese endpoint puntual, no
+    # es un problema de CSRF/Referer mal armado. En vez de fallar aquí,
+    # se continúa sin el token CSRF -- las peticiones GET (como listar
+    # bases de datos) no lo necesitan; si la petición POST de extracción
+    # lo exige de verdad, fallará más adelante con un mensaje claro.
     csrf_token = None
     csrf_resp = requests.get(
         f"{SUPERSET_URL}/api/v1/security/csrf_token/",
@@ -246,11 +224,10 @@ def iniciar_sesion(password: str) -> requests.Session:
 
 def listar_bases_de_datos(session: requests.Session):
     """
-    Pide a Superset la lista de conexiones a bases de datos que tu
-    usuario puede ver (el mismo listado que llena el dropdown "Database"
-    de SQL Lab -- por eso, si puedes elegir "clickhouse" ahí, tu usuario
-    SÍ tiene permiso para ver este listado por API, aunque tu rol sea de
-    solo consulta y no tengas acceso al panel de administración).
+    Pide a Superset la lista de conexiones a bases de datos visibles para
+    el usuario autenticado (el mismo listado que llena el dropdown
+    "Database" de SQL Lab -- un rol de solo consulta, sin acceso al panel
+    de administración, ya tiene permiso para verlo por API).
     """
     resp = session.get(f"{SUPERSET_URL}/api/v1/database/", params={"q": "(page_size:100)"}, timeout=30)
     if not resp.ok:
@@ -259,16 +236,17 @@ def listar_bases_de_datos(session: requests.Session):
     if not resultados:
         print("La API no devolvió ninguna base de datos (revisar permisos).")
         return
-    print("\nBases de datos visibles para tu usuario:")
+    print("\nBases de datos visibles:")
     for r in resultados:
         print(f"  id={r['id']:<4} nombre={r.get('database_name', r.get('name'))}")
     print(
-        "\nBusca en esta lista la fila cuyo nombre es 'clickhouse' (la misma que ves en el "
-        "dropdown 'Database' de SQL Lab) y usa ese 'id' como DATABASE_ID."
+        "\nBuscar en esta lista la fila cuyo nombre es 'clickhouse' (la misma que aparece en el "
+        "dropdown 'Database' de SQL Lab) y usar ese 'id' como DATABASE_ID."
     )
 
 
 def ejecutar_consulta(session: requests.Session, periodo: str, offset: int):
+    """Ejecuta la consulta de un periodo/offset puntual (mismas columnas y ORDER BY que 04b_enemdu_persona_periodo_grande_paginado.sql) y devuelve (columnas, filas)."""
     sql = (
         f"SELECT {COLUMNAS_SQL} FROM {SQL_SCHEMA}.enemdu_persona "
         f"WHERE periodo = '{periodo}' ORDER BY id_persona "
@@ -287,6 +265,7 @@ def ejecutar_consulta(session: requests.Session, periodo: str, offset: int):
 
 
 def guardar_csv(path: Path, columnas, filas):
+    """Escribe columnas/filas como CSV en 'path', creando la carpeta destino si hace falta."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=columnas)
@@ -296,11 +275,11 @@ def guardar_csv(path: Path, columnas, filas):
 
 def main():
     if "COMPLETAR" in SUPERSET_URL:
-        sys.exit("Falta SUPERSET_URL. Complétalo al inicio del archivo antes de correr esto.")
+        sys.exit("Falta SUPERSET_URL. Completar al inicio del archivo antes de correr esto.")
     if DATABASE_ID == 0 and not SOLO_LISTAR_BASES:
         sys.exit(
-            "Falta DATABASE_ID. Si no lo conoces, deja SOLO_LISTAR_BASES = True y corre el "
-            "script para que te lo muestre (ver nota 'SOBRE EL DATABASE_ID' en el docstring)."
+            "Falta DATABASE_ID. Si no se conoce, dejar SOLO_LISTAR_BASES = True y correr el "
+            "script para obtenerlo (ver 'DATABASE_ID' en el docstring)."
         )
 
     if SOLO_LISTAR_BASES:
@@ -320,8 +299,8 @@ def main():
         session = iniciar_sesion(password)
     except requests.HTTPError as e:
         sys.exit(
-            f"No se pudo iniciar sesión ({e}). Posibles causas: tu Superset usa SSO/2FA "
-            "(este método no funciona en ese caso), o la URL/endpoint no es la esperada. Avísame el error exacto."
+            f"No se pudo iniciar sesión ({e}). Posibles causas: la instalación de Superset usa "
+            "SSO/2FA (este método no funciona en ese caso), o la URL/endpoint no es la esperada."
         )
     print("Login OK.")
 
@@ -349,8 +328,8 @@ def main():
         time.sleep(0.5)  # no saturar el servidor
 
     # Verificación final: suma de filas por periodo (todas sus páginas)
-    # contra la volumetría real que compartiste -- esto es justamente lo
-    # que hubiera detectado antes el problema de las páginas de 10,000.
+    # contra la volumetría real -- esta comparación es la que hubiera
+    # detectado antes el problema de las páginas de 10,000.
     if PRUEBA_RAPIDA:
         print(
             "\n(PRUEBA_RAPIDA=True: la verificación de abajo va a marcar 'DISCREPANCIA' para el "

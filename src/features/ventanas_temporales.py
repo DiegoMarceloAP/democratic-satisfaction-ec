@@ -1,7 +1,7 @@
 """
 ventanas_temporales.py
 ---------------------------------------------------------------------
-Fase de Preparación de Features - construcción del input temporal del
+Fase de Modelado (CRISP-DM) - preparación de features: construcción del input temporal del
 CNN-LSTM: por cada persona de dataset_modelado_personas.csv, arma una
 ventana de VENTANA_TEMPORAL_ANIOS (3, según el plan de modelado) con
 los indicadores macro de panel_macro_anual.csv correspondientes a los

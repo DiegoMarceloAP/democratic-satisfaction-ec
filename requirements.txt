@@ -1,7 +1,7 @@
-# Fase 2 (Preparación de datos) -- ya en uso
+# Fase 2 (Preparación de datos)
 pandas>=2.0
 numpy>=1.24
-pyreadstat>=1.2               # lee los .sav (SPSS) de Latinobarómetro 2011-2024, ver latinobarometro_loader_crudo.py
+pyreadstat>=1.2               # lee los .sav (SPSS) de Latinobarómetro 2011-2024.
 
 # Fase de Modelado
 scikit-learn>=1.3

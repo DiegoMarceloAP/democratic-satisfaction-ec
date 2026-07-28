@@ -1,6 +1,8 @@
 """
 config_features.py
 ---------------------------------------------------------------------
+Fase de Modelado (CRISP-DM) - definición de features.
+
 Definición ÚNICA y compartida de qué columnas de dataset_modelado_personas.csv
 se usan como features, para que los 4 modelos del plan (XGBoost, LightGBM,
 CNN-LSTM, TabNet) entrenen sobre EXACTAMENTE el mismo conjunto de variables
@@ -13,13 +15,12 @@ fuga de información), ni las columnas crudas ya recodificadas en sus
 versiones '_cat'/'_bin'/'_alta' (evita duplicar la misma información dos
 veces bajo dos codificaciones distintas).
 
-FUENTE (revisión con tutor): Latinobarómetro ya no viene de Superset (ver
-sql/02_latinobarometro_ecuador.sql, deprecado por inconsistencias) sino
-de las descargas directas de Latinobarómetro por ola -- ver
-latinobarometro_loader_crudo.py. elections_vote se descarta de forma
-permanente (solo 1 de 13 olas tiene dato real); todas las demás variables
-del cuestionario original, incluidas resp_chief y los 4 bienes del hogar,
-están disponibles en las 13 olas y se incluyen abajo.
+FUENTE: Latinobarómetro no viene de Superset, sino de las descargas
+directas por ola (ver latinobarometro_loader_crudo.py). elections_vote
+se descarta de forma permanente (solo 1 de 13 olas tiene dato real);
+todas las demás variables del cuestionario original, incluidas
+resp_chief y los 4 bienes del hogar, están disponibles en las 13 olas y
+se incluyen abajo.
 """
 
 COLUMNA_ANIO = "anio"

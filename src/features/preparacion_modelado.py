@@ -1,6 +1,8 @@
 """
 preparacion_modelado.py
 ---------------------------------------------------------------------
+Fase de Modelado (CRISP-DM) - preparación de datos.
+
 Funciones de preparación de datos COMUNES a los modelos no secuenciales
 del plan de modelado (XGBoost, LightGBM, TabNet): cargar el dataset a
 nivel persona, seleccionar/validar columnas de features (ver

@@ -27,8 +27,9 @@ X_train, SMOTE con la misma random_state, codificación categórica) que
 usó cada script de entrenamiento -- así las explicaciones se calculan
 sobre los datos reales, en las mismas unidades/códigos que el modelo
 aprendió. Si algún día cambia el preprocesamiento de esos scripts, hay
-que reflejar el cambio aquí también (no hay una única fuente de verdad
-compartida todavía; ver nota al final del archivo).
+que reflejar el cambio aquí también: este módulo no comparte una única
+fuente de verdad con los scripts de entrenamiento, así que es un punto
+de mantenimiento a vigilar si el pipeline de preparación cambia.
 
 DECISIÓN DE DISEÑO -- nunca explicar filas sintéticas de SMOTE: todas
 las funciones de este módulo calculan SHAP únicamente sobre el X_test
@@ -153,8 +154,7 @@ def _neutralizar_columnas_implausibles(shap_values: np.ndarray, feature_names: l
     (que queda mal condicionada cuando hay columnas casi colineales en el
     background, más probable en folds con pocos años reales de
     entrenamiento, donde la ventana temporal del CNN-LSTM tiene muy poca
-    variedad real -- ver discusión sobre si panel_macro_anual.csv alcanza
-    para el CNN-LSTM).
+    variedad real entre los encuestados de ese mismo año).
 
     IMPORTANTE: subir 'nsamples' (100 -> 800) NO fue suficiente por sí
     solo -- se probó y el problema reapareció en OTRAS columnas distintas

@@ -1,9 +1,7 @@
 """
 enemdu_processing.py
 ---------------------------------------------------------------------
-Fase 2 (Preparación de datos) - CRISP-DM
-Tesis: Deep Learning for Modeling Democratic Satisfaction and
-Socioeconomic Inequality in Ecuador.
+Fase 2 (Preparación de datos) - CRISP-DM.
 
 Procesa los microdatos crudos de personas de ENEMDU extraídos desde
 Superset (ver sql/04_enemdu_persona_por_periodo.sql, un CSV por periodo)

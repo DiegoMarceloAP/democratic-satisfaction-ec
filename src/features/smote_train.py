@@ -1,9 +1,8 @@
 """
 smote_train.py
 ---------------------------------------------------------------------
-Fase de Preparación de Features - SMOTE aplicado ÚNICAMENTE sobre
-X_train, después del split (regla definida en la propuesta de tesis),
-y de forma independiente POR FOLD de Time Series Split (ver
+Fase de Modelado (CRISP-DM) - preparación de features: SMOTE aplicado ÚNICAMENTE sobre
+X_train, después del split , y de forma independiente POR FOLD de Time Series Split (ver
 src/evaluation/time_series_split.py y las conclusiones de
 notebooks/01_eda_balance_clases.ipynb: el balance de clases cambia
 según el rango de años de cada fold, así que no existe una única
