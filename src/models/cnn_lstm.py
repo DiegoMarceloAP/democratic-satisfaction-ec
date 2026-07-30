@@ -30,21 +30,21 @@ entre esas variables antes de que la LSTM module su evolución temporal.
 Es una interpretación FUNCIONAL del rol "espacial" del CNN (los
 indicadores macro no tienen un orden espacial real), no literal.
 
-DECISIÓN DE DISEÑO -- SMOTE sobre datos secuenciales: SMOTE/SMOTENC
-(src/features/smote_train.py) solo aceptan vectores 2D. Para cumplir la
-regla del proyecto ("SMOTE únicamente sobre X_train, después del
+DECISIÓN DE DISEÑO -- SMOTENC sobre datos secuenciales: SMOTENC
+(src/features/smote_train.py) solo acepta vectores 2D. Para cumplir la
+regla del proyecto ("SMOTENC únicamente sobre X_train, después del
 split") también en este modelo secuencial, se APLANA la ventana
 temporal (y su máscara) junto con las variables estáticas en un solo
-vector 2D por persona, se aplica SMOTE sobre esa representación
+vector 2D por persona, se aplica SMOTENC sobre esa representación
 aplanada, y luego se RECONSTRUYEN los tensores [batch, ventana,
 features] a partir del resultado balanceado. La máscara (0/1) se
 redondea (>=0.5) después de interpolarse, y los valores de la ventana
 que quedaron faltantes (mask=False) se imputan ANTES de aplanar
-(SMOTE no acepta NaN) usando la mediana de ESE mismo timestep, con
+(SMOTENC no acepta NaN) usando la mediana de ESE mismo timestep, con
 estadísticas calculadas solo con observaciones reales de X_train.
 
 NOTA DE VALIDACIÓN: la lógica de datos de este módulo (ventaneo,
-aplanado, SMOTE, reconstrucción, alineación posicional de folds) se
+aplanado, SMOTENC, reconstrucción, alineación posicional de folds) se
 validó primero con datos sintéticos que reproducen la estructura real
 de dataset_modelado_personas.csv y panel_macro_anual.csv, incluyendo el
 caso límite de encuestados de 2007 con historia incompleta -- necesario
@@ -234,7 +234,7 @@ def entrenar_evaluar_cnn_lstm(
     device: "torch.device | None" = None,
 ) -> tuple[pd.DataFrame, list]:
     """
-    Entrena y evalúa el CNN-LSTM con Time Series Split + SMOTE por fold
+    Entrena y evalúa el CNN-LSTM con Time Series Split + SMOTENC por fold
     (misma partición que los baselines de árboles). Retorna (resultados
     por fold, lista de modelos entrenados).
 
@@ -313,7 +313,7 @@ def entrenar_evaluar_cnn_lstm(
         X_train_static, X_test_static = imputar_faltantes(X_train_static, X_test_static, features_numericas)
         seq_train, seq_test = _imputar_ventanas(seq_train, mask_train, seq_test, mask_test)
 
-        # --- SMOTE sobre la representación aplanada (ventana + máscara + estáticas) ---
+        # --- SMOTENC sobre la representación aplanada (ventana + máscara + estáticas) ---
         n_train, _, n_features_macro = seq_train.shape
         columnas_seq = [f"seq_t{t}_{feat}" for t in range(ventana) for feat in columnas_macro]
         columnas_mask = [f"mask_t{t}" for t in range(ventana)]
@@ -330,7 +330,7 @@ def entrenar_evaluar_cnn_lstm(
         X_static_bal = X_flat_bal[features_categoricas + features_numericas]
 
         # --- Escalado (solo para la red neuronal; los árboles no lo necesitan).
-        # SMOTE ya corrió en unidades originales, igual que en los baselines. ---
+        # SMOTENC ya corrió en unidades originales, igual que en los baselines. ---
         scaler_estatica = StandardScaler().fit(X_static_bal[features_numericas])
         X_num_train_esc = scaler_estatica.transform(X_static_bal[features_numericas])
         X_num_test_esc = scaler_estatica.transform(X_test_static[features_numericas])
