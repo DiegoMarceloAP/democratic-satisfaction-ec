@@ -67,7 +67,7 @@ def preparar_features(
         # (ej. confidence_*_alta, construidas con .isin(...).where(...) en
         # latinobarometro_processing.py) se guardan en el CSV como
         # True/False/vacío y, al releerlas con pd.read_csv, quedan en dtype
-        # "object" (no numérico) en vez de float -- lo cual rompe SMOTE
+        # "object" (no numérico) en vez de float -- lo cual rompe SMOTENC
         # (las trata como categóricas) y a XGBoost/LightGBM/TabNet (rechazan
         # columnas dtype object). astype(float) convierte True/False/NaN a
         # 1.0/0.0/NaN de forma segura sin alterar los valores ya numéricos.
@@ -126,7 +126,7 @@ def imputar_faltantes(
     Imputación simple (mediana para numéricas, categoría constante
     '__faltante__' para categóricas), con las estadísticas calculadas
     SOLO sobre X_train de este fold y aplicadas a X_train y X_test --
-    necesaria antes de SMOTE (SMOTE/SMOTENC no aceptan NaN) y consistente
+    necesaria antes de SMOTENC (SMOTENC no acepta NaN) y consistente
     con la regla de no fuga de información entre folds.
     """
     X_train = X_train.copy()
@@ -179,7 +179,7 @@ def codificar_categoricas(
     """
     Codifica cada columna categórica a enteros [0..n_categorias-1] según
     las categorías vistas en ESTE fold de entrenamiento (después de
-    SMOTE, si aplica). Categorías de prueba no vistas en entrenamiento
+    SMOTENC, si aplica). Categorías de prueba no vistas en entrenamiento
     se mapean a un índice adicional reservado ('desconocido'), para que
     el modelo (embeddings de CNN-LSTM o de TabNet) tenga una
     representación aprendible en vez de fallar con una categoría nunca

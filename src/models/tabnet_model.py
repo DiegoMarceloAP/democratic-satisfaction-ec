@@ -24,7 +24,7 @@ numéricas escaladas], por eso cat_idxs = range(len(features_categoricas)).
 
 Escalado: solo las columnas NUMÉRICAS se estandarizan (las categóricas
 usan embeddings, no lo necesitan) -- igual que en cnn_lstm.py, ajustado
-solo con X_train de cada fold, después de SMOTE (que corre en unidades
+solo con X_train de cada fold, después de SMOTENC (que corre en unidades
 originales, igual que en los demás modelos).
 
 NOTA DE VALIDACIÓN: la construcción de los arreglos de entrada (código
@@ -85,7 +85,7 @@ def entrenar_evaluar_tabnet(
     **kwargs_tabnet,
 ) -> tuple[pd.DataFrame, list]:
     """
-    Entrena y evalúa TabNet con Time Series Split + SMOTE por fold
+    Entrena y evalúa TabNet con Time Series Split + SMOTENC por fold
     (misma partición y misma regla de remuestreo que los demás modelos).
     Retorna (resultados por fold, lista de modelos entrenados).
 

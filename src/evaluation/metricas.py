@@ -2,7 +2,9 @@
 metricas.py
 ---------------------------------------------------------------------
 Fase de Evaluación (CRISP-DM) - Tabla comparativa final de los 4
-modelos del plan de modelado (XGBoost, LightGBM, CNN-LSTM, TabNet).
+modelos del plan de modelado (XGBoost, LightGBM, CNN-LSTM, TabNet) más
+Regresión Logística, incorporada como baseline estadístico adicional a
+pedido del tutor (src/models/baseline_logistic_regression.py).
 
 Cada modelo ya guarda sus resultados POR FOLD de Time Series Split en
 reports/tablas/resultados_<modelo>.csv (ver guardar_resultados() en
@@ -27,6 +29,7 @@ RUTA_FIGURES = Path("reports/figures")
 # Nombre a mostrar -> archivo de resultados por fold (guardado por cada
 # src/models/*.py). Editar aquí si se agrega un modelo nuevo.
 RESULTADOS_POR_MODELO = {
+    "Regresión Logística": "resultados_baseline_logreg.csv",
     "XGBoost": "resultados_baseline_xgboost.csv",
     "LightGBM": "resultados_baseline_lightgbm.csv",
     "CNN-LSTM": "resultados_cnn_lstm.csv",

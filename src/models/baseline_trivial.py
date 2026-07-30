@@ -2,7 +2,8 @@
 baseline_trivial.py
 ---------------------------------------------------------------------
 Fase de Evaluación (CRISP-DM) - Línea base trivial (clasificador de
-clase mayoritaria), la Tabla 5.1 comparaba XGBoost/LightGBM/
+clase mayoritaria), agregada a pedido del tutor y del revisor externo
+tras la defensa preliminar: la Tabla 5.1 comparaba XGBoost/LightGBM/
 CNN-LSTM/TabNet entre sí, pero no contra ningún punto de referencia
 "sin información", así que no quedaba claro cuánto valor agregan
 realmente los 4 modelos entrenados.

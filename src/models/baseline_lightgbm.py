@@ -3,7 +3,7 @@ baseline_lightgbm.py
 ---------------------------------------------------------------------
 Fase de Modelado (CRISP-DM) - Modelo baseline 2/2 de Machine Learning:
 LightGBM sobre dataset_modelado_personas.csv, con la MISMA metodología
-de evaluación que baseline_xgboost.py (Time Series Split + SMOTE por
+de evaluación que baseline_xgboost.py (Time Series Split + SMOTENC por
 fold) y EXACTAMENTE las mismas features (src/features/config_features.py),
 para que ambos baselines sean comparables entre sí en la tabla final.
 
@@ -47,7 +47,7 @@ def entrenar_evaluar_lightgbm(
     **kwargs_lightgbm,
 ) -> tuple[pd.DataFrame, list]:
     """
-    Entrena y evalúa LightGBM con Time Series Split + SMOTE por fold
+    Entrena y evalúa LightGBM con Time Series Split + SMOTENC por fold
     (misma partición y misma regla de remuestreo que baseline_xgboost.py).
     Retorna (resultados por fold, lista de modelos entrenados).
 

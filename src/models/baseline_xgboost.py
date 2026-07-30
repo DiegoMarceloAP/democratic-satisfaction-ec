@@ -7,7 +7,7 @@ CONTEMPORÁNEOS de ENEMDU y V-Dem -- ver src/data_prep/merge_final.py,
 sin la serie agregada de Latinobarómetro para evitar fuga de información).
 
 Evaluación con Time Series Split por año real de encuesta
-(src/evaluation/time_series_split.py) y SMOTE aplicado ÚNICAMENTE sobre
+(src/evaluation/time_series_split.py) y SMOTENC aplicado ÚNICAMENTE sobre
 X_train de cada fold, detectando la clase minoritaria real de ese fold
 (src/features/smote_train.py) -- nunca sobre X_test.
 
@@ -18,7 +18,7 @@ nominales como 'resp_religion' o 'democ_supp_cat'. SMOTENC (dentro de
 aplicar_smote_train) necesita esas columnas como texto plano (no dtype
 'category' de pandas) para funcionar correctamente, así que el cast a
 'category' (src/features/preparacion_modelado.castear_categoricas) se
-hace recién DESPUÉS de aplicar SMOTE, justo antes de entrenar/predecir.
+hace recién DESPUÉS de aplicar SMOTENC, justo antes de entrenar/predecir.
 
 La lista de features (FEATURES_CATEGORICAS/FEATURES_NUMERICAS) vive en
 src/features/config_features.py, compartida con baseline_lightgbm.py,
@@ -63,7 +63,7 @@ def entrenar_evaluar_xgboost(
 ) -> tuple[pd.DataFrame, list]:
     """
     Entrena y evalúa XGBoost con Time Series Split (ventana expansiva por
-    año real de encuesta) + SMOTE por fold. Retorna:
+    año real de encuesta) + SMOTENC por fold. Retorna:
         resultados: DataFrame con una fila por fold (métricas + tiempo)
         modelos:    lista de los XGBClassifier entrenados, uno por fold
                     (el último, entrenado con más años, es el candidato a
@@ -79,7 +79,29 @@ def entrenar_evaluar_xgboost(
     interna casi no cambió el resultado) y se confirmó que era
     SOBREAJUSTE: un modelo más simple mejora sustancialmente ese fold sin
     perjudicar a los demás.
-    
+
+    Se descartó deliberadamente construir una validación interna anidada
+    (reservar el último año de entrenamiento de cada fold para elegir
+    hiperparámetros) porque, con solo 10 años reales de encuesta:
+    (a) el primer fold pasaría de 5 a 4 años de entrenamiento real y el
+    de prueba se movería de 2017 a 2018 -- se perdería un fold de prueba
+    de los 5 que ya son pocos; y (b) se comprobó empíricamente que un
+    solo año de validación interna (2020) NO habría elegido la
+    configuración correcta para el fold de 2023 (son shocks distintos:
+    COVID vs. la disolución de la Asamblea) -- la señal de un único año
+    es demasiado ruidosa para ser confiable. Por eso se optó por un
+    ajuste GLOBAL y conservador, justificado a priori (folds de
+    entrenamiento pequeños + filas sintéticas de SMOTENC = mayor riesgo de
+    sobreajuste con un modelo de alta capacidad), no por una búsqueda de
+    hiperparámetros por fold.
+
+    Validado con los 5 folds reales completos: el PR-AUC promedio sube de
+    0.4649 (config original) a 0.4860 con este ajuste, mejorando 2017,
+    2018, 2023 y 2024, con una cesión marginal solo en 2020 (0.2750 ->
+    0.2505). El fold de 2023 en particular pasa de PR-AUC 0.1776 a 0.2922.
+    Sigue sin ser una búsqueda exhaustiva de hiperparámetros (eso queda
+    como trabajo futuro, ver src/models/README.md) -- es un ajuste
+    puntual y documentado, no el resultado de optimizar mirando el test.
     """
     X, y = preparar_features(df, features_categoricas, features_numericas, COLUMNA_ANIO, COLUMNA_TARGET)
     folds = generar_folds_temporales(

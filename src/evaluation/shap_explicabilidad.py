@@ -23,7 +23,7 @@ tabnet_model.py, cnn_lstm.py) devuelven los modelos ya entrenados, pero
 NO devuelven el X_test procesado de cada fold (para no inflar la firma
 de esas funciones). Este módulo reconstruye ese X_test repitiendo
 EXACTAMENTE los mismos pasos (imputación con medianas/constante de
-X_train, SMOTE con la misma random_state, codificación categórica) que
+X_train, SMOTENC con la misma random_state, codificación categórica) que
 usó cada script de entrenamiento -- así las explicaciones se calculan
 sobre los datos reales, en las mismas unidades/códigos que el modelo
 aprendió. Si algún día cambia el preprocesamiento de esos scripts, hay
@@ -31,7 +31,7 @@ que reflejar el cambio aquí también: este módulo no comparte una única
 fuente de verdad con los scripts de entrenamiento, así que es un punto
 de mantenimiento a vigilar si el pipeline de preparación cambia.
 
-DECISIÓN DE DISEÑO -- nunca explicar filas sintéticas de SMOTE: todas
+DECISIÓN DE DISEÑO -- nunca explicar filas sintéticas de SMOTENC: todas
 las funciones de este módulo calculan SHAP únicamente sobre el X_test
 de cada fold (encuestados reales nunca vistos en entrenamiento), jamás
 sobre X_train_bal (que incluye filas sintéticas). Explicar una fila
@@ -51,7 +51,7 @@ recibe 4 tensores (ventana secuencial, máscara, categóricas estáticas,
 numéricas estáticas), pero KernelSHAP necesita una función
 matriz_2d -> vector. Se aplana todo en una sola fila por persona, con la
 MISMA convención de nombres de columna que ya usa cnn_lstm.py para su
-propio aplanado de SMOTE ('seq_t{t}_{variable}', 'mask_t{t}') --
+propio aplanado de SMOTENC ('seq_t{t}_{variable}', 'mask_t{t}') --
 reutilizando exactamente la misma idea que rezagos_macro.py: exponer la
 ventana temporal como columnas planas para poder analizarla con
 herramientas que esperan un vector, no un tensor.
@@ -379,7 +379,7 @@ def explicar_arbol(
 def _preparar_fold_tabnet(X, y, fold, features_categoricas, features_numericas, random_state):
     """
     Reconstruye X_train_final/X_test_final EXACTAMENTE como
-    tabnet_model.py (misma imputación, SMOTE, codificación categórica y
+    tabnet_model.py (misma imputación, SMOTENC, codificación categórica y
     escalado numérico) -- necesario para que el background y los códigos
     categóricos de KernelSHAP coincidan con lo que el modelo aprendió.
     """
@@ -424,7 +424,7 @@ def explicar_tabnet(
     KernelSHAP sobre uno o varios folds de TabNet ya entrenado. El
     background (referencia de "valor normal" de cada variable) se resume
     con shap.kmeans sobre X_train_final del propio fold (ya balanceado por
-    SMOTE, en las mismas unidades que vio el modelo) -- 'tamano_background'
+    SMOTENC, en las mismas unidades que vio el modelo) -- 'tamano_background'
     controla cuántos centroides usar (no todo X_train, por costo
     computacional de KernelSHAP). 'nsamples' controla cuántas
     perturbaciones evalúa KernelSHAP por instancia explicada (más =
@@ -505,7 +505,7 @@ def _preparar_fold_cnn_lstm(
     """
     Reconstruye, para un fold de CNN-LSTM, las matrices PLANAS (background
     de entrenamiento y X_test a explicar) en las MISMAS unidades finales
-    que vio el modelo (post-SMOTE, escaladas) -- réplica de
+    que vio el modelo (post-SMOTENC, escaladas) -- réplica de
     cnn_lstm.entrenar_evaluar_cnn_lstm líneas ~263-309, pero deteniéndose
     antes de construir el DataLoader/entrenar (el modelo ya está entrenado).
 
@@ -640,7 +640,7 @@ def explicar_cnn_lstm(
     """
     KernelSHAP sobre uno o varios folds del CNN-LSTM ya entrenado. Ver
     nota de diseño del módulo: la ventana temporal se aplana en columnas
-    'seq_t{t}_{variable}' / 'mask_t{t}', igual que en el aplanado de SMOTE
+    'seq_t{t}_{variable}' / 'mask_t{t}', igual que en el aplanado de SMOTENC
     de cnn_lstm.py -- así el resumen global de SHAP puede mostrar, por
     ejemplo, si 'tasa_desempleo' pesa más en t0 (hace 2 años) o en t2
     (el propio año de la encuesta).

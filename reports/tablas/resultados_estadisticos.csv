@@ -1,13 +1,21 @@
 metrica,comparacion,friedman_chi2,friedman_p,wilcoxon_p_sin_corregir,wilcoxon_p_holm,significativo_holm_0.05
-pr_auc,XGBoost vs LightGBM,14.55,0.0022,0.0078,0.0469,True
-pr_auc,XGBoost vs CNN-LSTM,14.55,0.0022,0.3828,0.7656,False
-pr_auc,XGBoost vs TabNet,14.55,0.0022,0.0078,0.0469,True
-pr_auc,LightGBM vs CNN-LSTM,14.55,0.0022,0.5469,0.7656,False
-pr_auc,LightGBM vs TabNet,14.55,0.0022,0.0156,0.0625,False
-pr_auc,CNN-LSTM vs TabNet,14.55,0.0022,0.0156,0.0625,False
-f1_satisfecho,XGBoost vs LightGBM,4.443,0.2174,0.25,0.75,False
-f1_satisfecho,XGBoost vs CNN-LSTM,4.443,0.2174,0.0547,0.3281,False
-f1_satisfecho,XGBoost vs TabNet,4.443,0.2174,0.0781,0.3906,False
-f1_satisfecho,LightGBM vs CNN-LSTM,4.443,0.2174,0.1094,0.4375,False
-f1_satisfecho,LightGBM vs TabNet,4.443,0.2174,0.4609,0.75,False
-f1_satisfecho,CNN-LSTM vs TabNet,4.443,0.2174,0.2969,0.75,False
+pr_auc,Regresión Logística vs XGBoost,17.6,0.0015,0.8438,1.0,False
+pr_auc,Regresión Logística vs LightGBM,17.6,0.0015,0.0547,0.2734,False
+pr_auc,Regresión Logística vs CNN-LSTM,17.6,0.0015,0.1094,0.4375,False
+pr_auc,Regresión Logística vs TabNet,17.6,0.0015,0.0078,0.0781,False
+pr_auc,XGBoost vs LightGBM,17.6,0.0015,0.0156,0.125,False
+pr_auc,XGBoost vs CNN-LSTM,17.6,0.0015,0.6406,1.0,False
+pr_auc,XGBoost vs TabNet,17.6,0.0015,0.0078,0.0781,False
+pr_auc,LightGBM vs CNN-LSTM,17.6,0.0015,0.8438,1.0,False
+pr_auc,LightGBM vs TabNet,17.6,0.0015,0.0156,0.125,False
+pr_auc,CNN-LSTM vs TabNet,17.6,0.0015,0.0156,0.125,False
+f1_satisfecho,Regresión Logística vs XGBoost,7.6923,0.1035,0.0391,0.3906,False
+f1_satisfecho,Regresión Logística vs LightGBM,7.6923,0.1035,0.1953,1.0,False
+f1_satisfecho,Regresión Logística vs CNN-LSTM,7.6923,0.1035,0.4688,1.0,False
+f1_satisfecho,Regresión Logística vs TabNet,7.6923,0.1035,0.5781,1.0,False
+f1_satisfecho,XGBoost vs LightGBM,7.6923,0.1035,0.3125,1.0,False
+f1_satisfecho,XGBoost vs CNN-LSTM,7.6923,0.1035,0.0547,0.4922,False
+f1_satisfecho,XGBoost vs TabNet,7.6923,0.1035,0.0547,0.4922,False
+f1_satisfecho,LightGBM vs CNN-LSTM,7.6923,0.1035,0.1094,0.7656,False
+f1_satisfecho,LightGBM vs TabNet,7.6923,0.1035,0.25,1.0,False
+f1_satisfecho,CNN-LSTM vs TabNet,7.6923,0.1035,0.2969,1.0,False

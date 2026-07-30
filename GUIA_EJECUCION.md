@@ -37,12 +37,12 @@ Al terminar, `data/processed/` tiene `dataset_modelado_personas.csv` (input de X
 
 ## Paso 3 — Entrenamiento
 
-`notebooks/02_entrenamiento_modelos.ipynb` entrena los 4 modelos uno a la vez:
+`notebooks/02_entrenamiento_modelos.ipynb` entrena los 5 modelos uno a la vez:
 
 1. Correr `00_parametros_globales.ipynb` primero (rutas, semilla, GPU, `SAMPLING_MODE`).
-2. Con `SAMPLING_MODE=True`, correr la celda de la muestra estratificada y luego cada modelo por separado (XGBoost → LightGBM → CNN-LSTM → TabNet), revisando resultados y tiempo antes de pasar al siguiente. Las celdas de CNN-LSTM/TabNet ajustan solas `n_epochs`/`max_epochs` según `SAMPLING_MODE` (5/10 en modo prueba, 15/100 en la corrida real).
+2. Con `SAMPLING_MODE=True`, correr la celda de la muestra estratificada y luego cada modelo por separado (Regresión Logística → XGBoost → LightGBM → CNN-LSTM → TabNet), revisando resultados y tiempo antes de pasar al siguiente. La Regresión Logística no tiene hiperparámetros que ajustar según `SAMPLING_MODE` (configuración estándar fija); las celdas de CNN-LSTM/TabNet sí ajustan solas `n_epochs`/`max_epochs` según `SAMPLING_MODE` (5/10 en modo prueba, 15/100 en la corrida real).
 3. Sección opcional: variables macro rezagadas (`rezagos_macro.py`) — compara XGBoost con y sin rezagos.
-4. Cuando los 4 corran bien con la muestra: cambiar `SAMPLING_MODE=False` y volver a correr el notebook completo desde el inicio. Cada `resultados_*.csv` se guarda automáticamente en `reports/tablas/`.
+4. Cuando los 5 corran bien con la muestra: cambiar `SAMPLING_MODE=False` y volver a correr el notebook completo desde el inicio. Cada `resultados_*.csv` se guarda automáticamente en `reports/tablas/`.
 
 ## Paso 4 — Evaluación final: tabla comparativa y SHAP
 
@@ -52,7 +52,7 @@ python src/evaluation/metricas.py
 
 Genera `reports/tablas/tabla_comparativa_final.csv` (Accuracy, F1, PR-AUC, tiempo de entrenamiento) y los gráficos de comparación en `reports/figures/`.
 
-Para SHAP, `notebooks/02_entrenamiento_modelos.ipynb` ya incluye las celdas de `src/evaluation/shap_explicabilidad.py` justo después de cada modelo — no hace falta re-entrenar ni agregarlas a mano: `explicar_arbol` (XGBoost/LightGBM, TreeSHAP), `explicar_tabnet`/`explicar_cnn_lstm` (KernelSHAP), y `explicar_perfil_local` (auditoría de un encuestado puntual, justo después del TreeSHAP de XGBoost, para el marco XAI dual global+local). Corre por fold, no como resumen global, para poder comparar qué variables cambian entre años.
+Para SHAP, `notebooks/02_entrenamiento_modelos.ipynb` ya incluye las celdas de `src/evaluation/shap_explicabilidad.py` justo después de cada uno de los 4 modelos de caja negra — no hace falta re-entrenar ni agregarlas a mano: `explicar_arbol` (XGBoost/LightGBM, TreeSHAP), `explicar_tabnet`/`explicar_cnn_lstm` (KernelSHAP), y `explicar_perfil_local` (auditoría de un encuestado puntual, justo después del TreeSHAP de XGBoost, para el marco XAI dual global+local). Corre por fold, no como resumen global, para poder comparar qué variables cambian entre años. La Regresión Logística no pasa por este módulo: su celda de entrenamiento en el notebook ya extrae e imprime directamente los coeficientes de mayor magnitud del último fold, que cumplen el mismo rol de explicabilidad sin necesidad de SHAP.
 
 **Notas de validación:** `explicar_arbol` corrigió un bug real de compatibilidad `xgboost`/`shap`; `explicar_tabnet`/`explicar_cnn_lstm` corrigieron una inestabilidad numérica puntual en el fold 2017 (ver `src/evaluation/README.md`).
 

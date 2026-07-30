@@ -74,7 +74,7 @@ def reportar_balance_por_fold(
     """
     Para cada fold, calcula el % de la clase 'Satisfecho' (1) en el
     conjunto de entrenamiento y en el de prueba. Esto es lo que decide
-    si SMOTE debe aplicarse (y sobre cuál clase) en cada fold en
+    si SMOTENC debe aplicarse (y sobre cuál clase) en cada fold en
     particular -- ver conclusiones de notebooks/01_eda_balance_clases.ipynb.
     """
     filas = []

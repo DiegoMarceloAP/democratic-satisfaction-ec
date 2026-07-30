@@ -2,11 +2,9 @@
 pruebas_estadisticas.py
 ---------------------------------------------------------------------
 Fase de Evaluación (CRISP-DM) - Prueba estadística formal de la
-comparación entre los 4 modelos (XGBoost, LightGBM, CNN-LSTM, TabNet),
-la Sección 5.2 afirmaba, solo a partir de la inspección
-visual de las barras de error, que las diferencias entre modelos "no
-alcanzan a ser estadísticamente concluyentes". Este script reemplaza
-esa afirmación informal por una prueba formal.
+comparación entre los 5 modelos (Regresión Logística, XGBoost,
+LightGBM, CNN-LSTM, TabNet). Este script reemplaza la inspección visual
+informal de las barras de error por una prueba formal.
 
 Metodología:
   1. Prueba de Friedman (no paramétrica, para >2 muestras pareadas
@@ -14,16 +12,17 @@ Metodología:
      Time Series Split) sobre cada métrica de interés (PR-AUC y F1
      de la clase "Satisfecho").
   2. Si Friedman resulta significativa (alfa=0.05), se calculan las
-     6 comparaciones pareadas posibles entre los 4 modelos mediante
+     10 comparaciones pareadas posibles entre los 5 modelos mediante
      la prueba de Wilcoxon (signed-rank), y se corrige el p-valor de
      cada una con Holm-Bonferroni para controlar la inflación del
      error tipo I por comparaciones múltiples.
 
 Los 8 valores por modelo se toman de los CSV por fold ya generados
-por cada script de modelado (resultados_baseline_xgboost.csv,
-resultados_baseline_lightgbm.csv, resultados_cnn_lstm.csv,
-resultados_tabnet.csv), ordenados por anio_test para que la prueba
-pareada compare siempre el mismo fold entre modelos.
+por cada script de modelado (resultados_baseline_logreg.csv,
+resultados_baseline_xgboost.csv, resultados_baseline_lightgbm.csv,
+resultados_cnn_lstm.csv, resultados_tabnet.csv), ordenados por
+anio_test para que la prueba pareada compare siempre el mismo fold
+entre modelos.
 """
 from pathlib import Path
 from itertools import combinations
@@ -34,6 +33,7 @@ from scipy.stats import friedmanchisquare, wilcoxon
 
 RUTA_TABLAS = Path("reports/tablas")
 ARCHIVOS_MODELOS = {
+    "Regresión Logística": RUTA_TABLAS / "resultados_baseline_logreg.csv",
     "XGBoost": RUTA_TABLAS / "resultados_baseline_xgboost.csv",
     "LightGBM": RUTA_TABLAS / "resultados_baseline_lightgbm.csv",
     "CNN-LSTM": RUTA_TABLAS / "resultados_cnn_lstm.csv",

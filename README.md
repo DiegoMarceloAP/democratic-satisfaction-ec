@@ -4,7 +4,7 @@ Tesis de Maestría en Inteligencia Artificial (Universidad Yachay Tech): *Deep L
 
 ## Descripción
 
-El proyecto modela la satisfacción ciudadana con la democracia en Ecuador (2007-2024) como un problema de clasificación binaria, integrando —por primera vez a nivel de encuestado individual— tres fuentes de naturaleza distinta: encuestas de opinión política (Latinobarómetro), indicadores de calidad democrática (V-Dem) y condiciones socioeconómicas oficiales (ENEMDU/INEC). Sigue la metodología CRISP-DM: extracción y preparación de datos, modelado comparativo (2 modelos de machine learning + 2 arquitecturas de deep learning) y evaluación bajo un marco de IA explicable (SHAP) dual.
+El proyecto modela la satisfacción ciudadana con la democracia en Ecuador (2007-2024) como un problema de clasificación binaria, integrando —por primera vez a nivel de encuestado individual— tres fuentes de naturaleza distinta: encuestas de opinión política (Latinobarómetro), indicadores de calidad democrática (V-Dem) y condiciones socioeconómicas oficiales (ENEMDU/INEC). Sigue la metodología CRISP-DM: extracción y preparación de datos, modelado comparativo (Regresión Logística + 2 modelos de machine learning + 2 arquitecturas de deep learning) y evaluación bajo un marco de IA explicable (SHAP) dual — complementado, en el caso de la Regresión Logística, con sus propios coeficientes, ya que no requiere SHAP para ser interpretable.
 
 **Variable objetivo:** `satisfecho_democracia` — binaria, construida a partir de `democ_satis` de Latinobarómetro (1 = Satisfecho, 0 = No Satisfecho; casos sin respuesta válida se descartan, no se imputan).
 
@@ -28,8 +28,8 @@ Latinobarómetro (nivel individuo) y V-Dem/ENEMDU (nivel país-año) se integran
 ├── scripts/                 automatización de extracción (ENEMDU vía Superset)
 ├── src/
 │   ├── data_prep/           Fase 2 -- procesamiento de las 3 fuentes + merge final
-│   ├── features/            ventanas temporales, rezagos macro, SMOTE, config de features
-│   ├── models/               XGBoost, LightGBM, CNN-LSTM, TabNet, línea base trivial
+│   ├── features/            ventanas temporales, rezagos macro, SMOTENC, config de features
+│   ├── models/               Regresión Logística, XGBoost, LightGBM, CNN-LSTM, TabNet, línea base trivial
 │   └── evaluation/           Time Series Split, tabla comparativa, pruebas estadísticas, SHAP
 ├── notebooks/
 │   ├── 00_parametros_globales.ipynb   semillas, GPU, SAMPLING_MODE, rutas (correr primero)
@@ -50,8 +50,8 @@ Latinobarómetro (nivel individuo) y V-Dem/ENEMDU (nivel país-año) se integran
 | `sql/` | Consultas SQL para extraer V-Dem y ENEMDU de Superset (Fase 1 de CRISP-DM). Latinobarómetro no tiene consulta aquí (ver `src/data_prep/latinobarometro_loader_crudo.py`). |
 | `scripts/` | `extraer_enemdu_superset.py` — automatiza la paginación de las consultas de ENEMDU contra Superset. |
 | `src/data_prep/` | Procesamiento de cada fuente (`enemdu_processing.py`, `vdem_processing.py`, `latinobarometro_loader_crudo.py`, `latinobarometro_processing.py`) y el merge final (`merge_final.py`) que produce los datasets de modelado. |
-| `src/features/` | Selección centralizada de variables (`config_features.py`), preparación común para los modelos no secuenciales (`preparacion_modelado.py`), ventanas temporales del CNN-LSTM (`ventanas_temporales.py`), rezagos macro para modelos tabulares (`rezagos_macro.py`) y SMOTE por fold (`smote_train.py`). |
-| `src/models/` | Los 4 modelos del plan de modelado (`baseline_xgboost.py`, `baseline_lightgbm.py`, `cnn_lstm.py`, `tabnet_model.py`) y la línea base trivial de referencia (`baseline_trivial.py`). |
+| `src/features/` | Selección centralizada de variables (`config_features.py`), preparación común para los modelos no secuenciales (`preparacion_modelado.py`), ventanas temporales del CNN-LSTM (`ventanas_temporales.py`), rezagos macro para modelos tabulares (`rezagos_macro.py`) y SMOTENC por fold (`smote_train.py`). |
+| `src/models/` | Los 5 modelos del plan de modelado (`baseline_logistic_regression.py`, `baseline_xgboost.py`, `baseline_lightgbm.py`, `cnn_lstm.py`, `tabnet_model.py`) y la línea base trivial de referencia (`baseline_trivial.py`). |
 | `src/evaluation/` | Partición temporal (`time_series_split.py`), tabla comparativa final (`metricas.py`), prueba estadística formal Friedman/Wilcoxon (`pruebas_estadisticas.py`) y el marco SHAP dual (`shap_explicabilidad.py`). |
 | `notebooks/` | Los 3 notebooks de ejecución, ver detalle abajo. |
 | `reports/figures/` | Gráficos generados (EDA, comparación de modelos, SHAP global por fold). |
@@ -66,15 +66,15 @@ Cada subcarpeta de `src/` tiene su propio `README.md` con el detalle de qué hac
 |---|---|
 | `00_parametros_globales.ipynb` | Configura rutas, semilla de reproducibilidad (`RANDOM_STATE=42`), detecta automáticamente GPU (`torch.cuda.is_available()`) y define el flag `SAMPLING_MODE` (`True` para iterar rápido con una muestra estratificada, `False` para la corrida final con el dataset completo). Se corre primero, antes que cualquier otro notebook. |
 | `01_eda_balance_clases.ipynb` | Análisis exploratorio del dataset de personas ya unificado: balance de la variable objetivo por año, proporción de valores faltantes por columna, correlaciones entre variables numéricas, variables categóricas frente al target, distribución demográfica y evolución anual de los indicadores macro. |
-| `02_entrenamiento_modelos.ipynb` | Entrena y evalúa los 4 modelos (XGBoost, LightGBM, CNN-LSTM, TabNet) uno a la vez sobre los 8 folds de Time Series Split, con SMOTE por fold y SHAP (global y local) inmediatamente después de cada modelo. Incluye una sección opcional de variables macro rezagadas para los modelos tabulares. |
+| `02_entrenamiento_modelos.ipynb` | Entrena y evalúa los 5 modelos (Regresión Logística, XGBoost, LightGBM, CNN-LSTM, TabNet) uno a la vez sobre los 8 folds de Time Series Split, con SMOTENC por fold. Los 4 modelos de caja negra (XGBoost, LightGBM, CNN-LSTM, TabNet) incluyen SHAP (global y local) inmediatamente después de cada uno; la Regresión Logística incluye en su lugar sus propios coeficientes, ya interpretables sin necesidad de SHAP. Incluye una sección opcional de variables macro rezagadas para los modelos tabulares. |
 
 ## Módulos Python
 
 **`src/data_prep/`** — `enemdu_processing.py` (indicadores agregados anuales ponderados por `fexp`), `vdem_processing.py` (índices V-Dem a nivel país-año), `latinobarometro_loader_crudo.py` (descarga oficial por ola, combina `.sav` y `.csv` corregido), `latinobarometro_processing.py` (variable objetivo y variables individuales), `merge_final.py` (integración multinivel de las 3 fuentes).
 
-**`src/features/`** — `config_features.py` (lista única de features compartida por los 4 modelos), `preparacion_modelado.py` (imputación y codificación comunes, después del split), `ventanas_temporales.py` (ventanas `[batch, timesteps, features]` del CNN-LSTM), `rezagos_macro.py` (variables macro rezagadas para modelos tabulares), `smote_train.py` (SMOTE únicamente sobre `X_train` de cada fold).
+**`src/features/`** — `config_features.py` (lista única de features compartida por los 5 modelos), `preparacion_modelado.py` (imputación y codificación comunes, después del split), `ventanas_temporales.py` (ventanas `[batch, timesteps, features]` del CNN-LSTM), `rezagos_macro.py` (variables macro rezagadas para modelos tabulares), `smote_train.py` (SMOTENC únicamente sobre `X_train` de cada fold; sin ruta alternativa a SMOTE genérico, por diseño).
 
-**`src/models/`** — `baseline_xgboost.py`, `baseline_lightgbm.py` (machine learning clásico), `cnn_lstm.py` (arquitectura mixta CNN + LSTM), `tabnet_model.py` (arquitectura nativa para datos tabulares), `baseline_trivial.py` (clasificador de clase mayoritaria, punto de referencia sin información).
+**`src/models/`** — `baseline_logistic_regression.py` (baseline estadístico adicional, incorporado a pedido del tutor; codifica categóricas *one-hot* y estandariza numéricas, a diferencia de los modelos de árboles), `baseline_xgboost.py`, `baseline_lightgbm.py` (machine learning clásico), `cnn_lstm.py` (arquitectura mixta CNN + LSTM), `tabnet_model.py` (arquitectura nativa para datos tabulares), `baseline_trivial.py` (clasificador de clase mayoritaria, punto de referencia sin información).
 
 **`src/evaluation/`** — `time_series_split.py` (partición de ventana expansiva), `metricas.py` (tabla comparativa final), `pruebas_estadisticas.py` (Friedman + Wilcoxon pareado con corrección de Holm-Bonferroni), `shap_explicabilidad.py` (TreeSHAP para árboles, KernelSHAP para redes, global y local).
 
@@ -111,7 +111,7 @@ Esto produce `dataset_modelado_personas.csv` (input de XGBoost/LightGBM/TabNet) 
 
 **4. Entrenar y evaluar los modelos:**
 1. Abrir `notebooks/02_entrenamiento_modelos.ipynb` y correr `00_parametros_globales.ipynb` primero.
-2. Con `SAMPLING_MODE=True`, correr cada modelo (XGBoost → LightGBM → CNN-LSTM → TabNet) sobre una muestra reducida, para validar que todo funciona.
+2. Con `SAMPLING_MODE=True`, correr cada modelo (Regresión Logística → XGBoost → LightGBM → CNN-LSTM → TabNet) sobre una muestra reducida, para validar que todo funciona.
 3. Cambiar a `SAMPLING_MODE=False` y volver a correr el notebook completo desde el inicio — esta es la corrida que alimenta los resultados finales. Cada `resultados_*.csv` se guarda automáticamente en `reports/tablas/`.
 
 **5. Consolidar la tabla comparativa final:**
