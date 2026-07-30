@@ -1,0 +1,16 @@
+feature,importancia_media_abs_shap
+econ_situation_cat,0.5146822047416251
+democ_supp_cat,0.3985773777085673
+confidence_congress_alta,0.32509441155603414
+resp_economic_perception_cat,0.2990938841007818
+confidence_political_parties_alta,0.20006604815299286
+tasa_participacion_global,0.14813803598344513
+confidence_police_alta,0.14729315273988317
+tasa_desempleo,0.1382579900158825
+resp_age,0.13248190052413214
+job_concern,0.12009016936173449
+confidence_army_alta,0.11878303652525225
+confidence_judiciary_alta,0.11257252419840359
+ideologia_cat,0.10773913524262503
+resp_education,0.0984967316069871
+goods_wash_mach_bin,0.08944196244272862

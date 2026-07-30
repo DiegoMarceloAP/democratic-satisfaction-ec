@@ -1,0 +1,16 @@
+feature,importancia_media_abs_shap
+democ_supp_cat,0.15442776118493765
+confidence_political_parties_alta,0.11773505664773415
+resp_economic_perception_cat,0.07286865520993004
+econ_situation_cat,0.054845337567529205
+confidence_police_alta,0.0437650489263425
+confidence_congress_alta,0.04358519228191834
+ingreso_promedio_laboral,0.03866721537356896
+v2pepwrgeo,0.024407075521225924
+resp_education,0.02106585318914552
+resp_age,0.01752137678077869
+resp_religion,0.016776296327246674
+resp_sex,0.01655194277544952
+ideologia_cat,0.016315650402781285
+pobreza_ingresos,0.012597471820907499
+confidence_army_alta,0.012488397058601837

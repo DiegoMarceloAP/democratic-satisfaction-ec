@@ -1,0 +1,16 @@
+feature,importancia_media_abs_shap
+resp_economic_perception_cat,0.11474443055749499
+democ_supp_cat,0.11085032822407688
+econ_situation_cat,0.09056990863845925
+pobreza_extrema_ingresos,0.06107109837762723
+confidence_congress_alta,0.045092698899777184
+pobreza_ingresos,0.04488922264463469
+v2xel_frefair,0.04086929018460253
+tasa_desempleo,0.03713085909803573
+gini_ingpc,0.027914070720994968
+confidence_political_parties_alta,0.02700081407075876
+ideologia_cat,0.02684171607633005
+v2x_delibdem,0.026840412518178376
+resp_education,0.020750792573474154
+goods_hot_water_bin,0.020661326655912377
+confidence_police_alta,0.018872165840499014
