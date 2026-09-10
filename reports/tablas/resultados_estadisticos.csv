@@ -1,0 +1,21 @@
+metrica,comparacion,friedman_chi2,friedman_p,wilcoxon_p_sin_corregir,wilcoxon_p_holm,diferencia_detectada_holm_0.05,rank_biserial_r,diferencia_media,ci95_bootstrap_bajo,ci95_bootstrap_alto
+pr_auc,Regresión Logística vs XGBoost,20.2,0.0005,0.9453,1.0,False,0.0556,-0.0007,-0.0113,0.0083
+pr_auc,Regresión Logística vs LightGBM,20.2,0.0005,0.0547,0.2734,False,0.7778,0.0119,0.0039,0.0198
+pr_auc,Regresión Logística vs CNN-LSTM,20.2,0.0005,0.25,1.0,False,0.5,0.008,-0.0036,0.0198
+pr_auc,Regresión Logística vs TabNet,20.2,0.0005,0.0078,0.0781,False,1.0,0.051,0.029,0.072
+pr_auc,XGBoost vs LightGBM,20.2,0.0005,0.0156,0.0938,False,0.9444,0.0126,0.008,0.0166
+pr_auc,XGBoost vs CNN-LSTM,20.2,0.0005,0.6406,1.0,False,0.2222,0.0087,-0.0064,0.0257
+pr_auc,XGBoost vs TabNet,20.2,0.0005,0.0078,0.0781,False,1.0,0.0517,0.0272,0.0765
+pr_auc,LightGBM vs CNN-LSTM,20.2,0.0005,0.6406,1.0,False,-0.2222,-0.0039,-0.0167,0.0097
+pr_auc,LightGBM vs TabNet,20.2,0.0005,0.0078,0.0781,False,1.0,0.0391,0.0177,0.0608
+pr_auc,CNN-LSTM vs TabNet,20.2,0.0005,0.0078,0.0781,False,1.0,0.043,0.0273,0.0585
+f1_satisfecho,Regresión Logística vs XGBoost,5.3082,0.2571,0.1094,0.9844,False,-0.6667,-0.0757,-0.1489,-0.0117
+f1_satisfecho,Regresión Logística vs LightGBM,5.3082,0.2571,0.1953,1.0,False,-0.5556,-0.0646,-0.1433,0.0069
+f1_satisfecho,Regresión Logística vs CNN-LSTM,5.3082,0.2571,0.8125,1.0,False,0.1429,0.0076,-0.0603,0.0727
+f1_satisfecho,Regresión Logística vs TabNet,5.3082,0.2571,0.25,1.0,False,-0.5,-0.0548,-0.1305,0.0196
+f1_satisfecho,XGBoost vs LightGBM,5.3082,0.2571,0.3828,1.0,False,0.3889,0.0111,-0.0093,0.0302
+f1_satisfecho,XGBoost vs CNN-LSTM,5.3082,0.2571,0.1094,0.9844,False,0.6667,0.0833,0.0125,0.1603
+f1_satisfecho,XGBoost vs TabNet,5.3082,0.2571,0.7422,1.0,False,0.1667,0.0209,-0.0304,0.0767
+f1_satisfecho,LightGBM vs CNN-LSTM,5.3082,0.2571,0.0781,0.7812,False,0.7222,0.0722,0.0106,0.1426
+f1_satisfecho,LightGBM vs TabNet,5.3082,0.2571,1.0,1.0,False,0.0,0.0098,-0.0308,0.0586
+f1_satisfecho,CNN-LSTM vs TabNet,5.3082,0.2571,0.1484,1.0,False,-0.6111,-0.0624,-0.1249,-0.0004

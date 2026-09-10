@@ -143,7 +143,9 @@ def _parchear_shap_xgboost_base_score() -> None:
 UMBRAL_SHAP_IMPLAUSIBLE = 10.0  # ver _neutralizar_columnas_implausibles
 
 
-def _neutralizar_columnas_implausibles(shap_values: np.ndarray, feature_names: list[str]) -> np.ndarray:
+def _neutralizar_columnas_implausibles(
+    shap_values: np.ndarray, feature_names: list[str], contexto: str = "",
+) -> np.ndarray:
     """
     BUG REAL encontrado corriendo KernelSHAP contra el CNN-LSTM real
     (fold 2017, el más chico de los 5): aparecieron valores de SHAP del
@@ -170,8 +172,13 @@ def _neutralizar_columnas_implausibles(shap_values: np.ndarray, feature_names: l
     idx_culpables = np.where(importancia > UMBRAL_SHAP_IMPLAUSIBLE)[0]
     if len(idx_culpables) > 0:
         detalle = ", ".join(f"{feature_names[i]}={importancia[i]:.3e}" for i in idx_culpables)
+        # 'contexto' (ej. "cnn_lstm, fold 2017") se agrega explícitamente al
+        # aviso -- antes el mensaje no identificaba el fold/modelo, lo que
+        # hizo ambigua la trazabilidad de qué fold específico disparó esta
+        # salvaguarda (observación de revisores, C5).
+        prefijo = f"[{contexto}] " if contexto else ""
         print(
-            f"AVISO: {len(idx_culpables)} columna(s) con SHAP implausible (> {UMBRAL_SHAP_IMPLAUSIBLE}, "
+            f"{prefijo}AVISO: {len(idx_culpables)} columna(s) con SHAP implausible (> {UMBRAL_SHAP_IMPLAUSIBLE}, "
             f"una probabilidad no puede depender tanto de una sola variable) -- se NEUTRALIZARON "
             f"(puestas en 0) para no contaminar el resumen; probable inestabilidad numérica de "
             f"KernelSHAP en este fold específico, no un hallazgo real. Columnas descartadas: {detalle}"
@@ -266,15 +273,115 @@ def guardar_resumen_shap(resumen: pd.DataFrame, out_path: Path) -> None:
     print(f"[shap_explicabilidad] Resumen guardado en '{out_path}'.")
 
 
+# ======================================================================
+# Etiquetas descriptivas para gráficos SHAP (legibilidad, observación de
+# revisores) -- el nombre técnico se mantiene siempre en el CSV guardado
+# por guardar_resumen_shap() y en las Tablas 4.2/4.3/4.4; esto solo
+# afecta la etiqueta dibujada en el eje Y de los PNG.
+# ======================================================================
+
+ETIQUETAS_DESCRIPTIVAS = {
+    # --- Latinobarómetro (Tabla 4.2) ---
+    "resp_sex": "Sexo del encuestado",
+    "resp_education": "Nivel educativo",
+    "resp_employment": "Situación laboral",
+    "resp_religion": "Religión",
+    "resp_chief": "Jefatura del hogar",
+    "resp_age": "Edad del encuestado",
+    "democ_supp_cat": "Apoyo a la democracia",
+    "ideologia_cat": "Autoubicación ideológica (izq./centro/der.)",
+    "econ_situation_cat": "Percepción de la situación económica personal",
+    "resp_economic_perception_cat": "Percepción de la situación económica del país",
+    "job_concern": "Preocupación por perder el empleo",
+    "goods_wash_mach_bin": "Posee lavadora",
+    "goods_car_bin": "Posee automóvil",
+    "goods_sewage_bin": "Tiene alcantarillado",
+    "goods_hot_water_bin": "Tiene agua caliente",
+    "confidence_congress_alta": "Confianza alta en el Congreso",
+    "confidence_judiciary_alta": "Confianza alta en el poder judicial",
+    "confidence_church_alta": "Confianza alta en la Iglesia",
+    "confidence_police_alta": "Confianza alta en la Policía",
+    "confidence_army_alta": "Confianza alta en el Ejército",
+    "confidence_political_parties_alta": "Confianza alta en los partidos políticos",
+    # --- V-Dem (Tabla 4.3) ---
+    "v2x_polyarchy": "Índice de democracia electoral (V-Dem)",
+    "v2x_libdem": "Índice de democracia liberal (V-Dem)",
+    "v2x_partipdem": "Índice de democracia participativa (V-Dem)",
+    "v2x_delibdem": "Índice de democracia deliberativa (V-Dem)",
+    "v2x_egaldem": "Índice de democracia igualitaria (V-Dem)",
+    "v2x_freexp_altinf": "Libertad de expresión e información alternativa (V-Dem)",
+    "v2xel_frefair": "Elecciones libres y justas (V-Dem)",
+    "v2xcl_rol": "Estado de derecho (V-Dem)",
+    "v2x_jucon": "Restricciones judiciales al ejecutivo (V-Dem)",
+    "v2xlg_legcon": "Restricciones legislativas al ejecutivo (V-Dem)",
+    "v2xeg_eqprotec": "Protección igualitaria ante la ley (V-Dem)",
+    "v2xeg_eqaccess": "Acceso igualitario al poder (V-Dem)",
+    "v2xeg_eqdr": "Distribución igualitaria de recursos (V-Dem)",
+    "v2pepwrses": "Poder distribuido por posición socioeconómica (V-Dem)",
+    "v2pepwrsoc": "Poder distribuido por grupo social (V-Dem)",
+    "v2pepwrgen": "Poder distribuido por género (V-Dem)",
+    "v2pepwrort": "Poder distribuido por orientación sexual (V-Dem)",
+    "v2pepwrgeo": "Poder distribuido por ubicación urbano-rural (V-Dem)",
+    # --- ENEMDU (Tabla 4.4) ---
+    "tasa_participacion_global": "Tasa de participación laboral",
+    "tasa_desempleo": "Tasa de desempleo",
+    "empleo_formal": "Tasa de empleo formal",
+    "empleo_informal": "Tasa de empleo informal",
+    "ingreso_promedio_pc": "Ingreso promedio per cápita",
+    "ingreso_promedio_laboral": "Ingreso laboral promedio",
+    "gini_ingpc": "Índice de Gini del ingreso per cápita",
+    "pobreza_ingresos": "Tasa de pobreza por ingresos",
+    "pobreza_extrema_ingresos": "Tasa de pobreza extrema por ingresos",
+}
+
+_SUFIJO_VENTANA = {0: " (hace 2 años)", 1: " (hace 1 año)", 2: " (año de la encuesta)"}
+
+
+def _etiqueta_legible(feature: str) -> str:
+    """
+    Traduce un nombre técnico de columna a una etiqueta descriptiva para
+    gráficos SHAP -- el nombre técnico se conserva siempre en el CSV
+    subyacente y en las Tablas 4.2-4.4; esta función solo decide qué
+    texto se dibuja en el eje Y del PNG.
+
+    Maneja tres formatos de nombre de columna:
+      - Directo: 'econ_situation_cat' -> etiqueta de ETIQUETAS_DESCRIPTIVAS.
+      - Ventana temporal del CNN-LSTM: 'seq_t{t}_{variable}' -> etiqueta
+        de la variable + sufijo de qué año de la ventana es (t=2 es
+        siempre el año de la propia encuesta, ver cnn_lstm.py).
+      - Máscara de historia: 'mask_t{t}' -> "Historia disponible (año ...)".
+      - Cualquier nombre no registrado se devuelve tal cual (nunca lanza
+        error), para no romper la generación de figuras si aparece una
+        variable nueva todavía sin etiquetar.
+    """
+    if feature.startswith("mask_t"):
+        t = int(feature.removeprefix("mask_t"))
+        return f"Historia disponible{_SUFIJO_VENTANA.get(t, '')}"
+    if feature.startswith("seq_t"):
+        t_str, _, base = feature.removeprefix("seq_t").partition("_")
+        t = int(t_str)
+        etiqueta_base = ETIQUETAS_DESCRIPTIVAS.get(base, base)
+        return f"{etiqueta_base}{_SUFIJO_VENTANA.get(t, '')}"
+    return ETIQUETAS_DESCRIPTIVAS.get(feature, feature)
+
+
 def graficar_resumen_shap(resumen: pd.DataFrame, titulo: str, out_path: Path) -> None:
-    """Gráfico de barras horizontal de importancia SHAP global -- mismo estilo que metricas.graficar_comparacion."""
+    """Gráfico de barras horizontal de importancia SHAP global -- mismo estilo que metricas.graficar_comparacion.
+
+    Las etiquetas del eje Y usan nombres descriptivos (_etiqueta_legible),
+    no el nombre técnico de columna -- el nombre técnico se mantiene en
+    el CSV guardado por guardar_resumen_shap() y en las Tablas 4.2-4.4.
+    """
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
+    resumen = resumen.copy()
+    resumen["etiqueta"] = resumen["feature"].map(_etiqueta_legible)
+
     fig, ax = plt.subplots(figsize=(8, 0.35 * len(resumen) + 1.5))
     orden = resumen.iloc[::-1]
-    ax.barh(orden["feature"], orden["importancia_media_abs_shap"], color="#4C72B0")
+    ax.barh(orden["etiqueta"], orden["importancia_media_abs_shap"], color="#4C72B0")
     ax.set_xlabel("Importancia media |SHAP|")
     ax.set_title(titulo)
     fig.tight_layout()
@@ -361,7 +468,9 @@ def explicar_arbol(
         # (explicar_perfil_local) también quede protegida -- de lo
         # contrario, el resumen global saldría limpio pero un perfil
         # individual todavía podría mostrar el valor implausible crudo.
-        shap_values = _neutralizar_columnas_implausibles(shap_values, columnas_features)
+        shap_values = _neutralizar_columnas_implausibles(
+            shap_values, columnas_features, contexto=f"{nombre_modelo}, fold {fold['anio_test']}"
+        )
 
         anio_test = fold["anio_test"]
         resumen = resumen_global_shap(shap_values, columnas_features, top_n=top_n)
@@ -468,7 +577,9 @@ def explicar_tabnet(
         funcion_prediccion = lambda m: modelo.predict_proba(m.astype("float32"))[:, 1]  # noqa: E731
         explainer = shap.KernelExplainer(funcion_prediccion, background)
         shap_values = explainer.shap_values(X_test_final, nsamples=nsamples, silent=True, l1_reg="num_features(20)")
-        shap_values = _neutralizar_columnas_implausibles(shap_values, columnas_features)  # ver explicar_arbol
+        shap_values = _neutralizar_columnas_implausibles(
+            shap_values, columnas_features, contexto=f"tabnet, fold {fold['anio_test']}"
+        )  # ver explicar_arbol
 
         anio_test = fold["anio_test"]
         resumen = resumen_global_shap(shap_values, columnas_features, top_n=top_n)
@@ -727,7 +838,9 @@ def explicar_cnn_lstm(
         # KernelSHAP -- ayuda a que el problema quede mejor condicionado
         # cuando hay columnas casi colineales (ver _neutralizar_columnas_implausibles).
         shap_values = explainer.shap_values(X_test_flat, nsamples=nsamples, silent=True, l1_reg="num_features(20)")
-        shap_values = _neutralizar_columnas_implausibles(shap_values, columnas_flat)  # ver explicar_arbol
+        shap_values = _neutralizar_columnas_implausibles(
+            shap_values, columnas_flat, contexto=f"cnn_lstm, fold {fold['anio_test']}"
+        )  # ver explicar_arbol
 
         anio_test = fold["anio_test"]
         resumen = resumen_global_shap(shap_values, columnas_flat, top_n=top_n)

@@ -1,0 +1,9 @@
+anio_test,n_anios_train,clase_minoritaria,n_filas_clase_minoritaria,brecha_anios_media,brecha_anios_mediana,pct_vecinos_mismo_anio,pct_vecinos_5_mas_anios,brecha_anios_maxima
+2013,5,Satisfecho,2418,0.0,0.0,100.0,0.0,0
+2015,6,Satisfecho,3129,0.0,0.0,100.0,0.0,0
+2016,7,Satisfecho,3829,0.0,0.0,100.0,0.0,0
+2017,8,Satisfecho,4322,0.0,0.0,100.0,0.0,0
+2018,9,Satisfecho,4933,0.0,0.0,100.0,0.0,0
+2020,10,Satisfecho,5359,0.0,0.0,100.0,0.0,0
+2023,11,Satisfecho,5477,0.0,0.0,100.0,0.0,0
+2024,12,Satisfecho,5619,0.0,0.0,100.0,0.0,0
